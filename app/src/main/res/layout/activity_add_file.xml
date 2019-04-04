@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.AddFileActivity">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_locker_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/item_added_file" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_browse_file"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="#008577"
+        app:srcCompat="@drawable/ic_insert_drive_file_white_24dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true" />
+
+</android.support.design.widget.CoordinatorLayout>

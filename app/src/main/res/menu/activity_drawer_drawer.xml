@@ -9,7 +9,7 @@
             android:icon="@drawable/ic_lock_outline_black_24dp"
             android:title="Lockers" />
         <item
-            android:id="@+id/nav_recent_activities"
+            android:id="@+id/nav_recent_actions"
             android:icon="@drawable/ic_access_time_black_24dp"
             android:title="Recent Activities" />
         <item

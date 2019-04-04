@@ -2,6 +2,7 @@ package com.delanobgt.lockerz.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ public class LockerAdapter extends RecyclerView.Adapter<LockerAdapter.LockerHold
     private List<Locker> lockers = new ArrayList<>();
     private OnLockerEditCallback onLockerEditCallback;
     private OnLockerDeleteCallback onLockerDeleteCallback;
+    private OnLockerSelectedCallback onLockerSelectedCallback;
 
     public LockerAdapter(Context context) {
         this.context = context;
@@ -39,6 +41,13 @@ public class LockerAdapter extends RecyclerView.Adapter<LockerAdapter.LockerHold
     @Override
     public void onBindViewHolder(@NonNull final LockerHolder holder, int position) {
         final Locker currentLocker = lockers.get(position);
+        holder.cvLocker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (onLockerSelectedCallback != null)
+                    onLockerSelectedCallback.onLockerSelected(currentLocker);
+            }
+        });
         holder.tvName.setText(currentLocker.getName());
         holder.tvDescription.setText(currentLocker.getDescription());
         holder.ibMore.setOnClickListener(new View.OnClickListener() {
@@ -94,13 +103,23 @@ public class LockerAdapter extends RecyclerView.Adapter<LockerAdapter.LockerHold
         this.onLockerDeleteCallback = onLockerDeleteCallback;
     }
 
+    public interface OnLockerSelectedCallback {
+        void onLockerSelected(Locker locker);
+    }
+
+    public void setOnLockerSelectedCallback(OnLockerSelectedCallback onLockerSelectedCallback) {
+        this.onLockerSelectedCallback = onLockerSelectedCallback;
+    }
+
     class LockerHolder extends RecyclerView.ViewHolder {
+        private CardView cvLocker;
         private TextView tvName;
         private TextView tvDescription;
         private ImageButton ibMore;
 
         public LockerHolder(View itemView) {
             super(itemView);
+            cvLocker = itemView.findViewById(R.id.cv_locker);
             tvName = itemView.findViewById(R.id.tv_name);
             tvDescription = itemView.findViewById(R.id.tv_description);
             ibMore = itemView.findViewById(R.id.ib_more);

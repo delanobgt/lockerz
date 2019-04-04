@@ -1,30 +1,26 @@
 package com.delanobgt.lockerz.activities;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.delanobgt.lockerz.R;
 import com.delanobgt.lockerz.fragments.AboutFragment;
 import com.delanobgt.lockerz.fragments.LockerListFragment;
-import com.delanobgt.lockerz.fragments.RecentActivityListFragment;
+import com.delanobgt.lockerz.fragments.RecentActionListFragment;
 import com.delanobgt.lockerz.fragments.SettingsFragment;
 
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private LockerListFragment lockerListFragment;
-    private RecentActivityListFragment recentActivityListFragment;
+    private RecentActionListFragment recentActivityListFragment;
     private SettingsFragment settingsFragment;
     private AboutFragment aboutFragment;
 
@@ -36,7 +32,7 @@ public class DrawerActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         lockerListFragment = new LockerListFragment();
-        recentActivityListFragment = new RecentActivityListFragment();
+        recentActivityListFragment = new RecentActionListFragment();
         settingsFragment = new SettingsFragment();
         aboutFragment = new AboutFragment();
 
@@ -75,8 +71,8 @@ public class DrawerActivity extends AppCompatActivity
         if (id == R.id.nav_lockers) {
             setTitle("Lockers");
             fragmentTransaction.replace(R.id.fragment_placeholder, lockerListFragment, "MyFragments");
-        } else if (id == R.id.nav_recent_activities) {
-            setTitle("Recent Activities");
+        } else if (id == R.id.nav_recent_actions) {
+            setTitle("Recent Actions");
             fragmentTransaction.replace(R.id.fragment_placeholder, recentActivityListFragment, "MyFragments");
         } else if (id == R.id.nav_settings) {
             setTitle("Settings");

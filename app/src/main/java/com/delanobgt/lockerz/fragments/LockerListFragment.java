@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,12 +19,14 @@ import android.widget.Toast;
 
 import com.delanobgt.lockerz.R;
 import com.delanobgt.lockerz.activities.AddEditLockerActivity;
+import com.delanobgt.lockerz.activities.LockerDetail;
 import com.delanobgt.lockerz.adapters.LockerAdapter;
+import com.delanobgt.lockerz.room.entities.Action;
 import com.delanobgt.lockerz.room.entities.Locker;
+import com.delanobgt.lockerz.viewmodels.ActionViewModel;
 import com.delanobgt.lockerz.viewmodels.LockerViewModel;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
@@ -36,6 +37,7 @@ public class LockerListFragment extends Fragment {
     public static final int EDIT_LOCKER_REQUEST = 2;
 
     private LockerViewModel lockerViewModel;
+    private ActionViewModel actionViewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -47,6 +49,14 @@ public class LockerListFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
 
         final LockerAdapter adapter = new LockerAdapter(getContext());
+        adapter.setOnLockerSelectedCallback(new LockerAdapter.OnLockerSelectedCallback() {
+            @Override
+            public void onLockerSelected(Locker locker) {
+                Intent intent = new Intent(getContext(), LockerDetail.class);
+                intent.putExtra(LockerDetail.EXTRA_NAME, locker.getName());
+                startActivity(intent);
+            }
+        });
         adapter.setOnLockerEditCallback(new LockerAdapter.OnLockerEditCallback() {
             @Override
             public void onLockerEdit(Locker locker) {
@@ -71,6 +81,7 @@ public class LockerListFragment extends Fragment {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 lockerViewModel.delete(locker);
+                                actionViewModel.insert(new Action(Action.ActionType.WARNING, String.format("Deleted Locker %s", locker.getName())));
                             }
                         })
                         .setNegativeButton(android.R.string.no, null)
@@ -80,13 +91,15 @@ public class LockerListFragment extends Fragment {
         });
         recyclerView.setAdapter(adapter);
 
-        lockerViewModel = ViewModelProviders.of(this).get(LockerViewModel.class);
+        lockerViewModel = ViewModelProviders.of(getActivity()).get(LockerViewModel.class);
         lockerViewModel.getAll().observe(this, new Observer<List<Locker>>() {
             @Override
             public void onChanged(@Nullable List<Locker> lockers) {
                 adapter.setLockers(lockers);
             }
         });
+
+        actionViewModel = ViewModelProviders.of(getActivity()).get(ActionViewModel.class);
 
         FloatingActionButton fab = view.findViewById(R.id.fab_add_locker);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -109,8 +122,10 @@ public class LockerListFragment extends Fragment {
             String description = data.getStringExtra(AddEditLockerActivity.EXTRA_DESCRIPTION);
             String encryptionType = data.getStringExtra(AddEditLockerActivity.EXTRA_ENCRYPTION_TYPE);
 
-            Locker note = new Locker(title, description, encryptionType);
-            lockerViewModel.insert(note);
+            Locker locker = new Locker(title, description, encryptionType);
+            lockerViewModel.insert(locker);
+
+            actionViewModel.insert(new Action(Action.ActionType.SUCCESS, String.format("Created Locker %s", locker.getName())));
 
             Toast.makeText(getContext(), "Locker saved", Toast.LENGTH_SHORT).show();
         } else if (requestCode == EDIT_LOCKER_REQUEST && resultCode == RESULT_OK) {
@@ -127,6 +142,9 @@ public class LockerListFragment extends Fragment {
             Locker locker = new Locker(name, description, encyptionType);
             locker.setId(id);
             lockerViewModel.update(locker);
+
+            actionViewModel.insert(new Action(Action.ActionType.INFO, String.format("Edited Locker %s", locker.getName())));
+
 
             Toast.makeText(getContext(), "Locker updated", Toast.LENGTH_SHORT).show();
         }

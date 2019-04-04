@@ -8,6 +8,13 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
+    <string name="lockerz_description">
+        Lockerz is a simple locker-based file encryption app.
+        With Lockers, you can easily encrypt your important/secret files or even folders.
+        It is as easy a 1-click away from your fingertips.
+    </string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_locker_detail">LockerDetail</string>
 </resources>
