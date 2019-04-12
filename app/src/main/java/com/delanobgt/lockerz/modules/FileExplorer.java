@@ -24,7 +24,7 @@ public class FileExplorer {
 
     public boolean navigateToFileItemIndex(int index) {
         if (0 <= index && index < fileItemList.length && fileItemList[index].getType() == FileType.DIRECTORY) {
-            currentDir = new File(currentDir.getAbsolutePath() + "/" + fileItemList[index].getPath());
+            currentDir = fileItemList[index].getFile();
             loadFileList();
             return true;
         }
@@ -81,9 +81,9 @@ public class FileExplorer {
             for (int i = 0; i < filteredFiles.length; i++) {
                 File file = new File(currentDir, filteredFiles[i]);
                 if (file.isDirectory()) {
-                    fileItemList[i] = new FileItem(filteredFiles[i], FileType.DIRECTORY);
+                    fileItemList[i] = new FileItem(currentDir + "/" + filteredFiles[i], FileType.DIRECTORY);
                 } else {
-                    fileItemList[i] = new FileItem(filteredFiles[i], FileType.FILE);
+                    fileItemList[i] = new FileItem(currentDir + "/" + filteredFiles[i], FileType.FILE);
                 }
             }
         } else {

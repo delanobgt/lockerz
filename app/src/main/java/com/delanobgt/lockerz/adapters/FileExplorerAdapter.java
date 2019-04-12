@@ -1,7 +1,9 @@
 package com.delanobgt.lockerz.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,10 +25,12 @@ public class FileExplorerAdapter extends RecyclerView.Adapter<FileExplorerAdapte
     private FileExplorer fileExplorer;
     private Map<Integer, Boolean> selectedIndices = new HashMap<>();
     private OnDirChangedCallback onDirChangedCallback;
+    private Map<String, FileExplorer.FileItem> addedFileItemDict;
 
-    public FileExplorerAdapter(Context context, FileExplorer fileExplorer) {
+    public FileExplorerAdapter(Context context, FileExplorer fileExplorer, Map<String, FileExplorer.FileItem> addedFileItemDict) {
         this.context = context;
         this.fileExplorer = fileExplorer;
+        this.addedFileItemDict = addedFileItemDict;
     }
 
     @Override
@@ -59,30 +63,45 @@ public class FileExplorerAdapter extends RecyclerView.Adapter<FileExplorerAdapte
             final int offset = !fileExplorer.isOnRootDir() ? -1 : 0;
             FileExplorer.FileItem fileItem = fileExplorer.getFileItemAt(position + offset);
             holder.tvName.setText(fileItem.getFile().getName());
-            if (fileItem.getType() == FileExplorer.FileType.DIRECTORY) {
-                holder.ivFileExplorer.setImageResource(R.drawable.ic_folder_24dp);
-                holder.tvDescription.setText("Folder");
-                holder.root.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        selectedIndices.clear();
-                        fileExplorer.navigateToFileItemIndex(position + offset);
-                        if (onDirChangedCallback != null) {
-                            onDirChangedCallback.callback(fileExplorer.getCurrentDir());
+            if (addedFileItemDict.containsKey(fileItem.getPath())) {
+                holder.ivFileExplorer.setColorFilter(Color.LTGRAY);
+                holder.tvName.setTextColor(Color.LTGRAY);
+                holder.tvDescription.setTextColor(Color.LTGRAY);
+                holder.ivFileExplorer.setImageResource(fileItem.getType() == FileExplorer.FileType.DIRECTORY ? R.drawable.ic_folder_24dp : R.drawable.ic_file_24dp);
+                holder.tvDescription.setText(fileItem.getType() == FileExplorer.FileType.DIRECTORY ? "Folder" : "File");
+                holder.cbSelected.setVisibility(View.GONE);
+                holder.root.setOnClickListener(null);
+            } else {
+                holder.ivFileExplorer.setColorFilter(ContextCompat.getColor(context, R.color.colorAccent));
+                holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                holder.tvDescription.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                if (fileItem.getType() == FileExplorer.FileType.DIRECTORY) {
+                    holder.ivFileExplorer.setImageResource(R.drawable.ic_folder_24dp);
+                    holder.tvDescription.setText("Folder");
+                    holder.cbSelected.setVisibility(View.VISIBLE);
+                    holder.root.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            selectedIndices.clear();
+                            fileExplorer.navigateToFileItemIndex(position + offset);
+                            if (onDirChangedCallback != null) {
+                                onDirChangedCallback.callback(fileExplorer.getCurrentDir());
+                            }
+                            notifyDataSetChanged();
                         }
-                        notifyDataSetChanged();
+                    });
+                } else {
+                    holder.ivFileExplorer.setImageResource(R.drawable.ic_file_24dp);
+                    holder.tvDescription.setText("File");
+                    holder.root.setOnClickListener(null);
+                }
+                holder.cbSelected.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        selectedIndices.put(position + offset, b);
                     }
                 });
-            } else {
-                holder.ivFileExplorer.setImageResource(R.drawable.ic_file_24dp);
-                holder.tvDescription.setText("File");
             }
-            holder.cbSelected.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    selectedIndices.put(position + offset, b);
-                }
-            });
         }
     }
 

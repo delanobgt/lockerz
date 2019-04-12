@@ -28,10 +28,12 @@ public class FileExplorerDialog extends Dialog {
     private FileExplorerAdapter fileExplorerAdapter;
     private FileExplorer fileExplorer;
     private OnSelectedFilesCallback onSelectedFilesCallback;
+    private Map<String, FileExplorer.FileItem> addedFileItemDict;
 
-    public FileExplorerDialog(Activity activity) {
+    public FileExplorerDialog(Activity activity, Map<String, FileExplorer.FileItem> addedFileItemDict) {
         super(activity);
         this.fileExplorer = new FileExplorer();
+        this.addedFileItemDict = addedFileItemDict;
     }
 
     @Override
@@ -52,11 +54,12 @@ public class FileExplorerDialog extends Dialog {
                     FileExplorer.FileItem[] fileItems = fileExplorer.getFileItemList();
                     List<FileExplorer.FileItem> selectedFileItems = new ArrayList<>();
                     for (int i = 0; i < fileItems.length; i++) {
-                        if (selectedIndices.get(i)) {
+                        if (selectedIndices.containsKey(i) && selectedIndices.get(i)) {
                             selectedFileItems.add(fileItems[i]);
                         }
                     }
-                    onSelectedFilesCallback.callback(selectedFileItems.toArray(new FileExplorer.FileItem[0]));
+                    onSelectedFilesCallback.callback(selectedFileItems);
+                    dismiss();
                 }
             }
         });
@@ -70,7 +73,7 @@ public class FileExplorerDialog extends Dialog {
         });
 
         recyclerView = findViewById(R.id.recycler_view);
-        fileExplorerAdapter = new FileExplorerAdapter(getContext(), fileExplorer);
+        fileExplorerAdapter = new FileExplorerAdapter(getContext(), fileExplorer, addedFileItemDict);
         fileExplorerAdapter.setOnDirChangedCallback(new FileExplorerAdapter.OnDirChangedCallback() {
             @Override
             public void callback(File currentDir) {
@@ -81,11 +84,11 @@ public class FileExplorerDialog extends Dialog {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
-    public void setOnLockerDeleteCallback(OnSelectedFilesCallback onSelectedFilesCallback) {
+    public void setOnSelectedFilesCallback(OnSelectedFilesCallback onSelectedFilesCallback) {
         this.onSelectedFilesCallback = onSelectedFilesCallback;
     }
 
     public interface OnSelectedFilesCallback {
-        void callback(FileExplorer.FileItem[] fileItems);
+        void callback(List<FileExplorer.FileItem> fileItems);
     }
 }
