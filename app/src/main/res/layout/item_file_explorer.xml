@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_toStartOf="@id/ib_close"
+            android:layout_toStartOf="@id/cb_selected"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="1234543212345432123"
@@ -42,21 +42,21 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_name"
             android:layout_alignParentStart="true"
-            android:layout_toStartOf="@id/ib_close"
+            android:layout_toStartOf="@id/cb_selected"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="123432123432123432123432123432"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
 
-        <ImageButton
-            android:id="@+id/ib_close"
+        <CheckBox
+            android:id="@+id/cb_selected"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:background="@null"
             android:clickable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:src="@drawable/ic_close_red_24dp" />
+            android:foreground="?android:attr/selectableItemBackground" />
+
     </RelativeLayout>
 </RelativeLayout>

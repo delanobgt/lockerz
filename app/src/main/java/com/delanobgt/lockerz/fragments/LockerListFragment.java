@@ -36,6 +36,9 @@ public class LockerListFragment extends Fragment {
     public static final int ADD_LOCKER_REQUEST = 1;
     public static final int EDIT_LOCKER_REQUEST = 2;
 
+    private RecyclerView recyclerView;
+    private LockerAdapter lockerAdapter;
+    private FloatingActionButton fab;
     private LockerViewModel lockerViewModel;
     private ActionViewModel actionViewModel;
 
@@ -44,12 +47,12 @@ public class LockerListFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_locker_list, container, false);
 
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view_locker);
+        recyclerView = view.findViewById(R.id.recycler_view_locker);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
 
-        final LockerAdapter adapter = new LockerAdapter(getContext());
-        adapter.setOnLockerSelectedCallback(new LockerAdapter.OnLockerSelectedCallback() {
+        lockerAdapter = new LockerAdapter(getContext());
+        lockerAdapter.setOnLockerSelectedCallback(new LockerAdapter.OnLockerSelectedCallback() {
             @Override
             public void onLockerSelected(Locker locker) {
                 Intent intent = new Intent(getContext(), LockerDetail.class);
@@ -57,7 +60,7 @@ public class LockerListFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        adapter.setOnLockerEditCallback(new LockerAdapter.OnLockerEditCallback() {
+        lockerAdapter.setOnLockerEditCallback(new LockerAdapter.OnLockerEditCallback() {
             @Override
             public void onLockerEdit(Locker locker) {
                 Intent intent = new Intent(getContext(), AddEditLockerActivity.class);
@@ -72,7 +75,7 @@ public class LockerListFragment extends Fragment {
                 startActivityForResult(intent, EDIT_LOCKER_REQUEST);
             }
         });
-        adapter.setOnLockerDeleteCallback(new LockerAdapter.OnLockerDeleteCallback() {
+        lockerAdapter.setOnLockerDeleteCallback(new LockerAdapter.OnLockerDeleteCallback() {
             @Override
             public void onLockerDelete(final Locker locker) {
                 new AlertDialog.Builder(getContext())
@@ -89,19 +92,19 @@ public class LockerListFragment extends Fragment {
                         .show();
             }
         });
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(lockerAdapter);
 
         lockerViewModel = ViewModelProviders.of(getActivity()).get(LockerViewModel.class);
         lockerViewModel.getAll().observe(this, new Observer<List<Locker>>() {
             @Override
             public void onChanged(@Nullable List<Locker> lockers) {
-                adapter.setLockers(lockers);
+                lockerAdapter.setLockers(lockers);
             }
         });
 
         actionViewModel = ViewModelProviders.of(getActivity()).get(ActionViewModel.class);
 
-        FloatingActionButton fab = view.findViewById(R.id.fab_add_locker);
+        fab = view.findViewById(R.id.fab_add_locker);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

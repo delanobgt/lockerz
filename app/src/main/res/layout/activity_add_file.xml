@@ -7,7 +7,7 @@
     tools:context=".activities.AddFileActivity">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view_locker_detail"
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:listitem="@layout/item_added_file" />

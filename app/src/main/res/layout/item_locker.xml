@@ -30,17 +30,6 @@
             android:paddingLeft="16dp"
             android:layout_centerVertical="true">
 
-            <ImageButton
-                android:id="@+id/ib_more"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:background="@null"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_more_vert_green_36dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:clickable="true"/>
-
             <TextView
                 android:id="@+id/tv_name"
                 android:layout_width="wrap_content"
@@ -62,6 +51,17 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="123432123432123432123432123432" />
+
+            <ImageButton
+                android:id="@+id/ib_more"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@null"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:src="@drawable/ic_more_vert_green_36dp" />
         </RelativeLayout>
     </RelativeLayout>
 

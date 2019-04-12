@@ -5,6 +5,9 @@
 
     <dist:module dist:instant="true" />
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,14 +15,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.AddFileActivity"
+        <activity
+            android:name=".activities.AddFileActivity"
             android:label="Add File"
-            ></activity>
+            android:parentActivityName=".activities.LockerDetail"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activities.LockerDetail"
-            android:icon="@drawable/ic_lock_outline_black_24dp"
             android:label="@string/title_activity_locker_detail"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:parentActivityName=".activities.DrawerActivity" />
         <activity
             android:name=".activities.AddEditLockerActivity"
             android:parentActivityName=".MainActivity" />
