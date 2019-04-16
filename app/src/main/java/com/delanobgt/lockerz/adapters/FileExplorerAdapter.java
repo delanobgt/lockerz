@@ -15,9 +15,12 @@ import android.widget.TextView;
 
 import com.delanobgt.lockerz.R;
 import com.delanobgt.lockerz.modules.FileExplorer;
+import com.delanobgt.lockerz.room.entities.FileItem;
+import com.delanobgt.lockerz.room.entities.Locker;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FileExplorerAdapter extends RecyclerView.Adapter<FileExplorerAdapter.ViewHolder> {
@@ -25,9 +28,10 @@ public class FileExplorerAdapter extends RecyclerView.Adapter<FileExplorerAdapte
     private FileExplorer fileExplorer;
     private Map<Integer, Boolean> selectedIndices = new HashMap<>();
     private OnDirChangedCallback onDirChangedCallback;
-    private Map<String, FileExplorer.FileItem> addedFileItemDict;
+    private Map<String, FileItem> addedFileItemDict;
+    private volatile Map<Integer, Locker> lockerDict = new HashMap<>();
 
-    public FileExplorerAdapter(Context context, FileExplorer fileExplorer, Map<String, FileExplorer.FileItem> addedFileItemDict) {
+    public FileExplorerAdapter(Context context, FileExplorer fileExplorer, Map<String, FileItem> addedFileItemDict) {
         this.context = context;
         this.fileExplorer = fileExplorer;
         this.addedFileItemDict = addedFileItemDict;
@@ -44,6 +48,9 @@ public class FileExplorerAdapter extends RecyclerView.Adapter<FileExplorerAdapte
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         if (!fileExplorer.isOnRootDir() && position == 0) {
+            holder.ivFileExplorer.setColorFilter(ContextCompat.getColor(context, R.color.colorAccent));
+            holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+            holder.tvDescription.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
             holder.ivFileExplorer.setImageResource(R.drawable.ic_subdirectory_arrow_left_black_24dp);
             holder.tvName.setText("....");
             holder.tvDescription.setText("Back");
@@ -61,21 +68,26 @@ public class FileExplorerAdapter extends RecyclerView.Adapter<FileExplorerAdapte
             });
         } else {
             final int offset = !fileExplorer.isOnRootDir() ? -1 : 0;
-            FileExplorer.FileItem fileItem = fileExplorer.getFileItemAt(position + offset);
+            FileItem fileItem = fileExplorer.getFileItemAt(position + offset);
             holder.tvName.setText(fileItem.getFile().getName());
             if (addedFileItemDict.containsKey(fileItem.getPath())) {
+                fileItem = addedFileItemDict.get(fileItem.getPath());
+                Locker locker = lockerDict.get(fileItem.getLockerId());
                 holder.ivFileExplorer.setColorFilter(Color.LTGRAY);
                 holder.tvName.setTextColor(Color.LTGRAY);
                 holder.tvDescription.setTextColor(Color.LTGRAY);
-                holder.ivFileExplorer.setImageResource(fileItem.getType() == FileExplorer.FileType.DIRECTORY ? R.drawable.ic_folder_24dp : R.drawable.ic_file_24dp);
-                holder.tvDescription.setText(fileItem.getType() == FileExplorer.FileType.DIRECTORY ? "Folder" : "File");
+                holder.ivFileExplorer.setImageResource(fileItem.getType() == FileItem.FileItemType.DIRECTORY ? R.drawable.ic_folder_24dp : R.drawable.ic_file_24dp);
+                if (locker != null)
+                    holder.tvDescription.setText("Owned by " + locker.getName());
+                else
+                    holder.tvDescription.setText("");
                 holder.cbSelected.setVisibility(View.GONE);
                 holder.root.setOnClickListener(null);
             } else {
                 holder.ivFileExplorer.setColorFilter(ContextCompat.getColor(context, R.color.colorAccent));
                 holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
                 holder.tvDescription.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
-                if (fileItem.getType() == FileExplorer.FileType.DIRECTORY) {
+                if (fileItem.getType() == FileItem.FileItemType.DIRECTORY) {
                     holder.ivFileExplorer.setImageResource(R.drawable.ic_folder_24dp);
                     holder.tvDescription.setText("Folder");
                     holder.cbSelected.setVisibility(View.VISIBLE);
@@ -95,6 +107,11 @@ public class FileExplorerAdapter extends RecyclerView.Adapter<FileExplorerAdapte
                     holder.tvDescription.setText("File");
                     holder.root.setOnClickListener(null);
                 }
+                if (selectedIndices.containsKey(position + offset)) {
+                    holder.cbSelected.setChecked(true);
+                } else {
+                    holder.cbSelected.setChecked(false);
+                }
                 holder.cbSelected.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -112,6 +129,14 @@ public class FileExplorerAdapter extends RecyclerView.Adapter<FileExplorerAdapte
 
     public Map<Integer, Boolean> getSelectedIndices() {
         return selectedIndices;
+    }
+
+    public void setLockerDict(List<Locker> lockers) {
+        lockerDict = new HashMap<>();
+        for (Locker locker : lockers) {
+            lockerDict.put(locker.getId(), locker);
+        }
+        notifyDataSetChanged();
     }
 
     public void setOnDirChangedCallback(OnDirChangedCallback onDirChangedCallback) {

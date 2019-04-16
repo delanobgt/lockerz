@@ -3,6 +3,8 @@ package com.delanobgt.lockerz.modules;
 import android.os.Environment;
 import android.util.Log;
 
+import com.delanobgt.lockerz.room.entities.FileItem;
+
 import java.io.File;
 import java.io.FilenameFilter;
 
@@ -23,7 +25,7 @@ public class FileExplorer {
     }
 
     public boolean navigateToFileItemIndex(int index) {
-        if (0 <= index && index < fileItemList.length && fileItemList[index].getType() == FileType.DIRECTORY) {
+        if (0 <= index && index < fileItemList.length && fileItemList[index].getType() == FileItem.FileItemType.DIRECTORY) {
             currentDir = fileItemList[index].getFile();
             loadFileList();
             return true;
@@ -81,50 +83,13 @@ public class FileExplorer {
             for (int i = 0; i < filteredFiles.length; i++) {
                 File file = new File(currentDir, filteredFiles[i]);
                 if (file.isDirectory()) {
-                    fileItemList[i] = new FileItem(currentDir + "/" + filteredFiles[i], FileType.DIRECTORY);
+                    fileItemList[i] = new FileItem(currentDir + "/" + filteredFiles[i], FileItem.FileItemType.DIRECTORY);
                 } else {
-                    fileItemList[i] = new FileItem(currentDir + "/" + filteredFiles[i], FileType.FILE);
+                    fileItemList[i] = new FileItem(currentDir + "/" + filteredFiles[i], FileItem.FileItemType.FILE);
                 }
             }
         } else {
             Log.e(TAG, "Path does not exist!");
-        }
-    }
-
-    public enum FileType {
-        FILE,
-        DIRECTORY
-    }
-
-    public static class FileItem {
-        private String path;
-        private FileType type;
-        private File file;
-
-        public FileItem(String path, FileType type) {
-            this.path = path;
-            this.type = type;
-            this.file = new File(path);
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public FileType getType() {
-            return type;
-        }
-
-        public File getFile() {
-            return file;
-        }
-
-        @Override
-        public String toString() {
-            return String.format(
-                    "Path: %s\n" +
-                            "Type: %s\n"
-                    , path, type);
         }
     }
 

@@ -12,12 +12,10 @@ import java.util.List;
 
 public class LockerViewModel extends AndroidViewModel {
     private LockerRepository repository;
-    private LiveData<List<Locker>> lockers;
 
     public LockerViewModel(@NonNull Application application) {
         super(application);
         repository = new LockerRepository(application);
-        lockers = repository.getAll();
     }
 
     public void insert(Locker locker) {
@@ -37,6 +35,11 @@ public class LockerViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Locker>> getAll() {
-        return lockers;
+        return repository.getAll();
     }
+
+    public LiveData<Locker> getById(int id) {
+        return repository.getById(id);
+    }
+
 }

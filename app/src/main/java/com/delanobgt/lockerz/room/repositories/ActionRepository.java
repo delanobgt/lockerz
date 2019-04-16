@@ -12,12 +12,10 @@ import java.util.List;
 
 public class ActionRepository {
     private ActionDao actionDao;
-    private LiveData<List<Action>> actions;
 
     public ActionRepository(Application application) {
         DB database = DB.getInstance(application);
         actionDao = database.actionDao();
-        actions = actionDao.getAll();
     }
 
     public void insert(final Action action) {
@@ -61,7 +59,7 @@ public class ActionRepository {
     }
 
     public LiveData<List<Action>> getAll() {
-        return actions;
+        return actionDao.getAll();
     }
 
 }

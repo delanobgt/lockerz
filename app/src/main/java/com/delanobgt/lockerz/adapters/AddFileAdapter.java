@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.delanobgt.lockerz.R;
-import com.delanobgt.lockerz.modules.FileExplorer;
+import com.delanobgt.lockerz.room.entities.FileItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 public class AddFileAdapter extends RecyclerView.Adapter<AddFileAdapter.ViewHolder> {
     private Context context;
     private View emptyView;
-    private List<FileExplorer.FileItem> fileItems = new ArrayList<>();
+    private List<FileItem> fileItems = new ArrayList<>();
 
     public AddFileAdapter(Context context, View emptyView) {
         this.context = context;
@@ -36,8 +36,8 @@ public class AddFileAdapter extends RecyclerView.Adapter<AddFileAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        FileExplorer.FileItem fileItem = fileItems.get(position);
-        if (fileItem.getType() == FileExplorer.FileType.DIRECTORY) {
+        FileItem fileItem = fileItems.get(position);
+        if (fileItem.getType() == FileItem.FileItemType.DIRECTORY) {
             holder.ivFileExplorer.setImageResource(R.drawable.ic_folder_24dp);
             holder.tvDescription.setText("Folder");
         } else {
@@ -61,8 +61,8 @@ public class AddFileAdapter extends RecyclerView.Adapter<AddFileAdapter.ViewHold
         return fileItems.size();
     }
 
-    public List<FileExplorer.FileItem> getFileItems() {
-        return fileItems;
+    public List<FileItem> getFileItems() {
+        return new ArrayList<>(fileItems);
     }
 
     public void addFileItems(List fileItems) {

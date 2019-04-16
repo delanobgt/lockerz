@@ -40,9 +40,11 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_CODE);
             } else {
                 startActivity(new Intent(getApplicationContext(), DrawerActivity.class));
+                finish();
             }
         } else {
             startActivity(new Intent(getApplicationContext(), DrawerActivity.class));
+            finish();
         }
     }
 
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startActivity(new Intent(getApplicationContext(), DrawerActivity.class));
+                    finish();
                 } else {
                     Toast.makeText(this, "The app was not allowed to write in your storage!", Toast.LENGTH_SHORT).show();
                     finish();

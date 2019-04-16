@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 
 import com.delanobgt.lockerz.room.converters.ActionTypeConverter;
 import com.delanobgt.lockerz.room.converters.DateConverter;
-import com.delanobgt.lockerz.room.converters.EncryptionTypeConverter;
 
 import java.util.Date;
 
@@ -34,12 +33,12 @@ public class Action {
         this.description = description;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @NonNull
@@ -47,9 +46,17 @@ public class Action {
         return actionType;
     }
 
+    public void setActionType(@NonNull ActionType actionType) {
+        this.actionType = actionType;
+    }
+
     @NonNull
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(@NonNull String description) {
+        this.description = description;
     }
 
     @NonNull
@@ -72,6 +79,7 @@ public class Action {
         ActionType(int code) {
             this.code = code;
         }
+
         public int getCode() {
             return code;
         }

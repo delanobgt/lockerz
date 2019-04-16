@@ -19,23 +19,21 @@ import android.widget.Toast;
 
 import com.delanobgt.lockerz.R;
 import com.delanobgt.lockerz.activities.AddEditLockerActivity;
+import com.delanobgt.lockerz.activities.ChangePasswordActivity;
 import com.delanobgt.lockerz.activities.LockerDetail;
 import com.delanobgt.lockerz.adapters.LockerAdapter;
+import com.delanobgt.lockerz.components.PasswordLoginDialog;
 import com.delanobgt.lockerz.room.entities.Action;
 import com.delanobgt.lockerz.room.entities.Locker;
 import com.delanobgt.lockerz.viewmodels.ActionViewModel;
 import com.delanobgt.lockerz.viewmodels.LockerViewModel;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 
-import static android.app.Activity.RESULT_OK;
 
 public class LockerListFragment extends Fragment {
 
-    public static final int ADD_LOCKER_REQUEST = 1;
-    public static final int EDIT_LOCKER_REQUEST = 2;
-
+    private View viewEmpty;
     private RecyclerView recyclerView;
     private LockerAdapter lockerAdapter;
     private FloatingActionButton fab;
@@ -47,32 +45,49 @@ public class LockerListFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_locker_list, container, false);
 
+        viewEmpty = view.findViewById(R.id.view_empty);
+
         recyclerView = view.findViewById(R.id.recycler_view_locker);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
 
-        lockerAdapter = new LockerAdapter(getContext());
+        lockerAdapter = new LockerAdapter(getContext(), viewEmpty);
         lockerAdapter.setOnLockerSelectedCallback(new LockerAdapter.OnLockerSelectedCallback() {
             @Override
-            public void onLockerSelected(Locker locker) {
-                Intent intent = new Intent(getContext(), LockerDetail.class);
-                intent.putExtra(LockerDetail.EXTRA_NAME, locker.getName());
-                startActivity(intent);
+            public void onLockerSelected(final Locker locker) {
+                PasswordLoginDialog passwordLoginDialog = new PasswordLoginDialog(getActivity(), locker);
+                passwordLoginDialog.setOnLoginSuccessCallback(new PasswordLoginDialog.OnLoginSuccessCallback() {
+                    @Override
+                    public void callback(String password) {
+                        Intent intent = new Intent(getContext(), LockerDetail.class);
+                        intent.putExtra(LockerDetail.EXTRA_LOCKER_ID, locker.getId());
+                        startActivity(intent);
+                    }
+                });
+                passwordLoginDialog.show();
             }
         });
         lockerAdapter.setOnLockerEditCallback(new LockerAdapter.OnLockerEditCallback() {
             @Override
-            public void onLockerEdit(Locker locker) {
-                Intent intent = new Intent(getContext(), AddEditLockerActivity.class);
-                intent.putExtra(AddEditLockerActivity.EXTRA_ID, locker.getId());
-                intent.putExtra(AddEditLockerActivity.EXTRA_NAME, locker.getName());
-                intent.putExtra(AddEditLockerActivity.EXTRA_DESCRIPTION, locker.getDescription());
-                intent.putExtra(AddEditLockerActivity.EXTRA_ENCRYPTION_TYPE, locker.getEncryptionType());
-
-                String formattedDate = new SimpleDateFormat("d MMM yyyy (HH:mm:ss)").format(locker.getCreatedAt());
-                intent.putExtra(AddEditLockerActivity.EXTRA_CREATED_AT, formattedDate);
-
-                startActivityForResult(intent, EDIT_LOCKER_REQUEST);
+            public void onLockerEdit(final Locker locker) {
+                PasswordLoginDialog passwordLoginDialog = new PasswordLoginDialog(getActivity(), locker);
+                passwordLoginDialog.setOnLoginSuccessCallback(new PasswordLoginDialog.OnLoginSuccessCallback() {
+                    @Override
+                    public void callback(String password) {
+                        Intent intent = new Intent(getContext(), AddEditLockerActivity.class);
+                        intent.putExtra(AddEditLockerActivity.EXTRA_LOCKER_ID, locker.getId());
+                        startActivity(intent);
+                    }
+                });
+                passwordLoginDialog.show();
+            }
+        });
+        lockerAdapter.setOnLockerChangePasswordCallback(new LockerAdapter.OnLockerChangePasswordCallback() {
+            @Override
+            public void callback(final Locker locker) {
+                Intent intent = new Intent(getContext(), ChangePasswordActivity.class);
+                intent.putExtra(AddEditLockerActivity.EXTRA_LOCKER_ID, locker.getId());
+                startActivity(intent);
             }
         });
         lockerAdapter.setOnLockerDeleteCallback(new LockerAdapter.OnLockerDeleteCallback() {
@@ -83,8 +98,21 @@ public class LockerListFragment extends Fragment {
                         .setMessage("Are you sure you want to delete this locker?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                lockerViewModel.delete(locker);
-                                actionViewModel.insert(new Action(Action.ActionType.WARNING, String.format("Deleted Locker %s", locker.getName())));
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        PasswordLoginDialog passwordLoginDialog = new PasswordLoginDialog(getActivity(), locker);
+                                        passwordLoginDialog.setOnLoginSuccessCallback(new PasswordLoginDialog.OnLoginSuccessCallback() {
+                                            @Override
+                                            public void callback(String password) {
+                                                lockerViewModel.delete(locker);
+                                                actionViewModel.insert(new Action(Action.ActionType.WARNING, String.format("Deleted Locker %s", locker.getName())));
+                                                Toast.makeText(getContext(), "Locker deleted", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                        passwordLoginDialog.show();
+                                    }
+                                });
                             }
                         })
                         .setNegativeButton(android.R.string.no, null)
@@ -109,49 +137,10 @@ public class LockerListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getContext(), AddEditLockerActivity.class);
-                startActivityForResult(intent, ADD_LOCKER_REQUEST);
+                startActivity(intent);
             }
         });
 
         return view;
     }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == ADD_LOCKER_REQUEST && resultCode == RESULT_OK) {
-            String title = data.getStringExtra(AddEditLockerActivity.EXTRA_NAME);
-            String description = data.getStringExtra(AddEditLockerActivity.EXTRA_DESCRIPTION);
-            String encryptionType = data.getStringExtra(AddEditLockerActivity.EXTRA_ENCRYPTION_TYPE);
-
-            Locker locker = new Locker(title, description, encryptionType);
-            lockerViewModel.insert(locker);
-
-            actionViewModel.insert(new Action(Action.ActionType.SUCCESS, String.format("Created Locker %s", locker.getName())));
-
-            Toast.makeText(getContext(), "Locker saved", Toast.LENGTH_SHORT).show();
-        } else if (requestCode == EDIT_LOCKER_REQUEST && resultCode == RESULT_OK) {
-            if (!data.hasExtra(AddEditLockerActivity.EXTRA_ID)) {
-                Toast.makeText(getContext(), "Locker can't be updated", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            int id = data.getIntExtra(AddEditLockerActivity.EXTRA_ID, -1);
-            String name = data.getStringExtra(AddEditLockerActivity.EXTRA_NAME);
-            String description = data.getStringExtra(AddEditLockerActivity.EXTRA_DESCRIPTION);
-            String encyptionType = data.getStringExtra(AddEditLockerActivity.EXTRA_ENCRYPTION_TYPE);
-
-            Locker locker = new Locker(name, description, encyptionType);
-            locker.setId(id);
-            lockerViewModel.update(locker);
-
-            actionViewModel.insert(new Action(Action.ActionType.INFO, String.format("Edited Locker %s", locker.getName())));
-
-
-            Toast.makeText(getContext(), "Locker updated", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
 }

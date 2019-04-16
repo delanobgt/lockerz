@@ -15,18 +15,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activities.ChangePasswordActivity" />
         <activity
             android:name=".activities.AddFileActivity"
-            android:label="Add File"
-            android:parentActivityName=".activities.LockerDetail"
-            android:theme="@style/AppTheme" />
+            android:label="Add files..." />
         <activity
             android:name=".activities.LockerDetail"
-            android:label="@string/title_activity_locker_detail"
-            android:parentActivityName=".activities.DrawerActivity" />
-        <activity
-            android:name=".activities.AddEditLockerActivity"
-            android:parentActivityName=".MainActivity" />
+            android:label="@string/title_activity_locker_detail" />
+        <activity android:name=".activities.AddEditLockerActivity" />
         <activity
             android:name=".activities.DrawerActivity"
             android:label="@string/title_activity_drawer"

@@ -4,6 +4,9 @@
         android:id="@+id/item_edit"
         android:title="Edit" />
     <item
-        android:id="@+id/item_delete"
-        android:title="Delete"/>
+        android:id="@+id/item_change_password"
+        android:title="Change Password" />
+    <item
+        android:id="@+id/item_delete_release"
+        android:title="Delete &amp; Release files" />
 </menu>

@@ -6,14 +6,31 @@
     android:layout_height="match_parent"
     tools:context=".activities.AddFileActivity">
 
-    <TextView
-        android:id="@+id/tv_empty"
+    <LinearLayout
+        android:id="@+id/view_empty"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="32dp"
-        android:text="No files added yet"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        tools:context=".fragments.AboutFragment">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:minHeight="100dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_file_24dp"
+            android:tint="@color/colorSoftGrey" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="No file yet"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@color/colorSoftGrey" />
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -27,9 +44,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="#008577"
-        app:srcCompat="@drawable/ic_insert_drive_file_white_24dp"
+        android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        android:clickable="true" />
+        android:tint="#ffffff"
+        app:backgroundTint="@color/colorPrimary"
+        app:srcCompat="@drawable/ic_folder_24dp" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -8,16 +8,20 @@ import com.delanobgt.lockerz.room.DB;
 import com.delanobgt.lockerz.room.daos.LockerDao;
 import com.delanobgt.lockerz.room.entities.Locker;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LockerRepository {
     private LockerDao lockerDao;
     private LiveData<List<Locker>> lockers;
+    private Map<Integer, LiveData<Locker>> lockersById;
 
     public LockerRepository(Application application) {
         DB database = DB.getInstance(application);
         lockerDao = database.lockerDao();
         lockers = lockerDao.getAll();
+        lockersById = new HashMap<>();
     }
 
     public void insert(Locker locker) {
@@ -64,4 +68,10 @@ public class LockerRepository {
         return lockers;
     }
 
+    public LiveData<Locker> getById(int id) {
+        if (!lockersById.containsKey(id)) {
+            lockersById.put(id, lockerDao.getById(id));
+        }
+        return lockersById.get(id);
+    }
 }

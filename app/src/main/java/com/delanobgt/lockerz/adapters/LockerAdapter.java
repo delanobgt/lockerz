@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.delanobgt.lockerz.R;
 import com.delanobgt.lockerz.room.entities.Locker;
@@ -21,13 +20,16 @@ import java.util.List;
 
 public class LockerAdapter extends RecyclerView.Adapter<LockerAdapter.LockerHolder> {
     private Context context;
+    private View emptyView;
     private List<Locker> lockers = new ArrayList<>();
     private OnLockerEditCallback onLockerEditCallback;
+    private OnLockerChangePasswordCallback onLockerChangePasswordCallback;
     private OnLockerDeleteCallback onLockerDeleteCallback;
     private OnLockerSelectedCallback onLockerSelectedCallback;
 
-    public LockerAdapter(Context context) {
+    public LockerAdapter(Context context, View emptyView) {
         this.context = context;
+        this.emptyView = emptyView;
     }
 
     @NonNull
@@ -63,7 +65,11 @@ public class LockerAdapter extends RecyclerView.Adapter<LockerAdapter.LockerHold
                                 if (onLockerEditCallback != null)
                                     onLockerEditCallback.onLockerEdit(currentLocker);
                                 return true;
-                            case R.id.item_delete:
+                            case R.id.item_change_password:
+                                if (onLockerChangePasswordCallback != null)
+                                    onLockerChangePasswordCallback.callback(currentLocker);
+                                return true;
+                            case R.id.item_delete_release:
                                 if (onLockerDeleteCallback != null)
                                     onLockerDeleteCallback.onLockerDelete(currentLocker);
                                 return true;
@@ -79,6 +85,8 @@ public class LockerAdapter extends RecyclerView.Adapter<LockerAdapter.LockerHold
 
     @Override
     public int getItemCount() {
+        if (lockers.isEmpty()) emptyView.setVisibility(View.VISIBLE);
+        else emptyView.setVisibility(View.GONE);
         return lockers.size();
     }
 
@@ -93,6 +101,14 @@ public class LockerAdapter extends RecyclerView.Adapter<LockerAdapter.LockerHold
 
     public void setOnLockerEditCallback(OnLockerEditCallback onLockerEditCallback) {
         this.onLockerEditCallback = onLockerEditCallback;
+    }
+
+    public void setOnLockerChangePasswordCallback(OnLockerChangePasswordCallback onLockerChangePasswordCallback) {
+        this.onLockerChangePasswordCallback = onLockerChangePasswordCallback;
+    }
+
+    public interface OnLockerChangePasswordCallback {
+        void callback(Locker locker);
     }
 
     public interface OnLockerDeleteCallback {

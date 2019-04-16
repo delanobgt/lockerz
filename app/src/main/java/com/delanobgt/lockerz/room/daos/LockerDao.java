@@ -28,4 +28,8 @@ public interface LockerDao {
 
     @Query("SELECT * FROM lockers ORDER BY name ASC")
     LiveData<List<Locker>> getAll();
+
+    @Query("SELECT * FROM lockers WHERE id = :id")
+    LiveData<Locker> getById(int id);
+
 }

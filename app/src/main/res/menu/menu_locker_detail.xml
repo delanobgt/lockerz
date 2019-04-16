@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/item_select_all"
+        android:icon="@drawable/ic_select_all_white_24dp"
+        android:title="Select All"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/item_decrypt"
+        android:icon="@drawable/ic_lock_open_white_24dp"
+        android:title="Decrypt"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/item_encrypt"
+        android:icon="@drawable/ic_lock_open_white_24dp"
+        android:title="Encrypt"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/item_delete_all"
+        android:icon="@drawable/ic_delete_white_24dp"
+        android:title="Unencrypt"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/item_edit"
+        android:title="Edit" />
+    <item
+        android:id="@+id/item_change_password"
+        android:title="Change Password" />
+    <item
+        android:id="@+id/item_delete_release"
+        android:title="Delete &amp; release files" />
+</menu>

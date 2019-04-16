@@ -2,7 +2,11 @@ package com.delanobgt.lockerz.components;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -13,6 +17,9 @@ import android.widget.TextView;
 import com.delanobgt.lockerz.R;
 import com.delanobgt.lockerz.adapters.FileExplorerAdapter;
 import com.delanobgt.lockerz.modules.FileExplorer;
+import com.delanobgt.lockerz.room.entities.FileItem;
+import com.delanobgt.lockerz.room.entities.Locker;
+import com.delanobgt.lockerz.viewmodels.LockerViewModel;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,10 +35,13 @@ public class FileExplorerDialog extends Dialog {
     private FileExplorerAdapter fileExplorerAdapter;
     private FileExplorer fileExplorer;
     private OnSelectedFilesCallback onSelectedFilesCallback;
-    private Map<String, FileExplorer.FileItem> addedFileItemDict;
+    private Map<String, FileItem> addedFileItemDict;
+    private LockerViewModel lockerViewModel;
+    private FragmentActivity activity;
 
-    public FileExplorerDialog(Activity activity, Map<String, FileExplorer.FileItem> addedFileItemDict) {
+    public FileExplorerDialog(Activity activity, Map<String, FileItem> addedFileItemDict) {
         super(activity);
+        this.activity = (FragmentActivity) activity;
         this.fileExplorer = new FileExplorer();
         this.addedFileItemDict = addedFileItemDict;
     }
@@ -51,8 +61,8 @@ public class FileExplorerDialog extends Dialog {
             public void onClick(View view) {
                 if (onSelectedFilesCallback != null) {
                     Map<Integer, Boolean> selectedIndices = fileExplorerAdapter.getSelectedIndices();
-                    FileExplorer.FileItem[] fileItems = fileExplorer.getFileItemList();
-                    List<FileExplorer.FileItem> selectedFileItems = new ArrayList<>();
+                    FileItem[] fileItems = fileExplorer.getFileItemList();
+                    List<FileItem> selectedFileItems = new ArrayList<>();
                     for (int i = 0; i < fileItems.length; i++) {
                         if (selectedIndices.containsKey(i) && selectedIndices.get(i)) {
                             selectedFileItems.add(fileItems[i]);
@@ -82,6 +92,14 @@ public class FileExplorerDialog extends Dialog {
         });
         recyclerView.setAdapter(fileExplorerAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        lockerViewModel = ViewModelProviders.of(activity).get(LockerViewModel.class);
+        lockerViewModel.getAll().observe(activity, new Observer<List<Locker>>() {
+            @Override
+            public void onChanged(@Nullable List<Locker> pLocker) {
+                fileExplorerAdapter.setLockerDict(pLocker);
+            }
+        });
     }
 
     public void setOnSelectedFilesCallback(OnSelectedFilesCallback onSelectedFilesCallback) {
@@ -89,6 +107,6 @@ public class FileExplorerDialog extends Dialog {
     }
 
     public interface OnSelectedFilesCallback {
-        void callback(List<FileExplorer.FileItem> fileItems);
+        void callback(List<FileItem> fileItems);
     }
 }

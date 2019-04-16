@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cv_locker"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/iv_file"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="50dp"
+        android:minHeight="50dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_folder_24dp" />
+
+    <ImageView
+        android:id="@+id/iv_encrypted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginRight="-33dp"
+        android:layout_toLeftOf="@+id/iv_file"
+        android:minWidth="25dp"
+        android:minHeight="25dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_lock_outline_black_24dp"
+        android:tint="@color/colorSoftGrey" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/iv_file"
+        android:paddingLeft="16dp">
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/ib_more"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="1234543212345432123"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+        <TextView
+            android:id="@+id/tv_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_name"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/ib_more"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="123432123432123432123432123432" />
+
+        <ImageButton
+            android:id="@+id/ib_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:src="@drawable/ic_more_vert_green_36dp"
+            android:theme="@style/AppTheme" />
+    </RelativeLayout>
+</RelativeLayout>
+
