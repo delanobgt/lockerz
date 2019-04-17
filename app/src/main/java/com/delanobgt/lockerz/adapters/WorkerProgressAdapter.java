@@ -31,13 +31,14 @@ public class WorkerProgressAdapter extends RecyclerView.Adapter<WorkerProgressAd
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_owned_file, parent, false);
+                .inflate(R.layout.item_worker_progress, parent, false);
         return new ViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         final WorkableFileGroup workableFileGroup = workableFileGroups.get(position);
+        holder.progressBar.setIndeterminate(false);
         if (workableFileGroup.isFinished()) {
             holder.ivStatus.setImageResource(R.drawable.ic_done_green_24dp);
             holder.progressBar.setProgress(100);
@@ -50,7 +51,7 @@ public class WorkerProgressAdapter extends RecyclerView.Adapter<WorkerProgressAd
             holder.tvDescription.setText(String.format("Work cancelled"));
         } else {
             holder.ivStatus.setImageResource(R.drawable.ic_access_time_24dp);
-            holder.progressBar.setProgress((int) (100 * (workableFileGroup.getModifiedTotalBytes() / workableFileGroup.getOriginalTotalBytes())));
+            holder.progressBar.setProgress((int) (100 * ((double) (workableFileGroup.getModifiedTotalBytes()) / workableFileGroup.getOriginalTotalBytes())));
             holder.ivStatus.setColorFilter(Color.BLUE);
             holder.tvDescription.setText(String.format("Encrypted %d out of %d file(s)", workableFileGroup.getModifiedFilesCount(), workableFileGroup.getOriginalFilesCount()));
         }

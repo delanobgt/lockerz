@@ -97,21 +97,22 @@ public class LockerListFragment extends Fragment {
                         .setMessage("Are you sure you want to delete this locker?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                getActivity().runOnUiThread(new Runnable() {
+
+                                PasswordLoginDialog passwordLoginDialog = new PasswordLoginDialog(getActivity(), locker);
+                                passwordLoginDialog.setOnLoginSuccessCallback(new PasswordLoginDialog.OnLoginSuccessCallback() {
                                     @Override
-                                    public void run() {
-                                        PasswordLoginDialog passwordLoginDialog = new PasswordLoginDialog(getActivity(), locker);
-                                        passwordLoginDialog.setOnLoginSuccessCallback(new PasswordLoginDialog.OnLoginSuccessCallback() {
+                                    public void callback(String password) {
+                                        getActivity().runOnUiThread(new Runnable() {
                                             @Override
-                                            public void callback(String password) {
+                                            public void run() {
                                                 lockerViewModel.delete(locker);
                                                 actionViewModel.insert(new Action(Action.ActionType.WARNING, String.format("Deleted Locker %s", locker.getName())));
                                                 Toast.makeText(getContext(), "Locker deleted", Toast.LENGTH_SHORT).show();
                                             }
                                         });
-                                        passwordLoginDialog.show();
                                     }
                                 });
+                                passwordLoginDialog.show();
                             }
                         })
                         .setNegativeButton(android.R.string.no, null)

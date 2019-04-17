@@ -29,6 +29,7 @@ import com.delanobgt.lockerz.room.entities.Locker;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class EncryptWorkerService extends Service {
@@ -54,8 +55,8 @@ public class EncryptWorkerService extends Service {
         return active;
     }
 
-    public WorkableFileGroup[] getWorkableFileGroups() {
-        return workableFileGroups;
+    public List<WorkableFileGroup> getWorkableFileGroups() {
+        return new ArrayList<>(Arrays.asList(workableFileGroups));
     }
 
     @Override
@@ -145,7 +146,7 @@ public class EncryptWorkerService extends Service {
 
     private void executeAllAsyncTasks() {
         for (int i = 0; i < asyncTasks.length; i++) {
-            asyncTasks[i].execute();
+            asyncTasks[i].executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
@@ -177,10 +178,15 @@ public class EncryptWorkerService extends Service {
                     .setOngoing(false)
                     .setContentText(String.format("Total: %d, Success: %d, Fail: %d", totalCount, successCount, failCount));
         } else {
-            int intTotalModifiedBytes = (int) (((double) totalModifiedBytes / Long.MAX_VALUE) * Integer.MAX_VALUE);
-            int intTotalOriginalBytes = (int) (((double) totalOriginalBytes / Long.MAX_VALUE) * Integer.MAX_VALUE);
+//            int intTotalModifiedBytes = (int) (((double) totalModifiedBytes / Long.MAX_VALUE) * Integer.MAX_VALUE);
+//            int intTotalOriginalBytes = (int) (((double) totalOriginalBytes / Long.MAX_VALUE) * Integer.MAX_VALUE);
+//            notificationBuilder
+//                    .setProgress(intTotalOriginalBytes, intTotalModifiedBytes, false)
+//                    .setContentTitle("Encryption in progress")
+//                    .setContentText(String.format("Processed %d out of %d file(s)", successCount + failCount, totalCount));
+
             notificationBuilder
-                    .setProgress(intTotalOriginalBytes, intTotalModifiedBytes, false)
+                    .setProgress(totalCount, successCount + failCount, false)
                     .setContentTitle("Encryption in progress")
                     .setContentText(String.format("Processed %d out of %d file(s)", successCount + failCount, totalCount));
         }
@@ -228,6 +234,7 @@ public class EncryptWorkerService extends Service {
                     break;
                 } else {
                     if (workableFileGroup.hasNext()) {
+                        Log.e("HAHAHA", workableFileGroup.getOriginalTotalBytes() + "");
                         if (!workableFileGroup.travelNext()) {
                             Log.e("HAHAHA", "TRAVEL ERROR ON " + workableFileGroup.toString());
                             cancel(true);

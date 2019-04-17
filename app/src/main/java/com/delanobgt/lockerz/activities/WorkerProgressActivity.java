@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 
 import com.delanobgt.lockerz.R;
 import com.delanobgt.lockerz.adapters.WorkerProgressAdapter;
@@ -18,7 +19,6 @@ import com.delanobgt.lockerz.modules.WorkableFileGroup;
 import com.delanobgt.lockerz.services.EncryptWorkerService;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 
 public class WorkerProgressActivity extends AppCompatActivity {
@@ -28,32 +28,54 @@ public class WorkerProgressActivity extends AppCompatActivity {
     private volatile EncryptWorkerService encryptWorkerService;
     private WorkType workType;
     private View viewEmpty;
+    private Button btnProceed;
     private RecyclerView recyclerView;
     private WorkerProgressAdapter workerProgressAdapter;
+    private List<WorkableFileGroup> workableFileGroups;
+
     private AsyncTask<Void, Void, Void> myAsyncTask = new AsyncTask<Void, Void, Void>() {
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            setWorkableFileGroups(workableFileGroups);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            btnProceed.setVisibility(View.VISIBLE);
+        }
+
         @Override
         protected Void doInBackground(Void... voids) {
             while (true) {
                 if (encryptWorkerService != null) {
-                    List<WorkableFileGroup> workableFileGroups = Arrays.asList(encryptWorkerService.getWorkableFileGroups());
+                    workableFileGroups = encryptWorkerService.getWorkableFileGroups();
                     boolean hasOnProgress = false;
                     for (WorkableFileGroup workableFileGroup : workableFileGroups) {
                         if (!workableFileGroup.isFinished() && !workableFileGroup.isCancelled())
                             hasOnProgress = true;
                     }
-                    workerProgressAdapter.setWorkableFileGroups(workableFileGroups);
-                    if (!hasOnProgress) break;
+                    publishProgress();
+                    if (!hasOnProgress) {
+                        break;
+                    }
                 }
                 try {
                     Thread.currentThread();
-                    Thread.sleep(1000);
+                    Thread.sleep(300);
                 } catch (Exception ex) {
                 }
             }
 
+
             return null;
         }
     };
+
+
+    private void setWorkableFileGroups(List<WorkableFileGroup> workableFileGroups) {
+        workerProgressAdapter.setWorkableFileGroups(workableFileGroups);
+    }
+
     private ServiceConnection encryptionServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
@@ -87,6 +109,15 @@ public class WorkerProgressActivity extends AppCompatActivity {
 
         viewEmpty = findViewById(R.id.view_empty);
 
+        btnProceed = findViewById(R.id.btn_proceed);
+        btnProceed.setVisibility(View.GONE);
+        btnProceed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setHasFixedSize(true);
@@ -94,6 +125,10 @@ public class WorkerProgressActivity extends AppCompatActivity {
         recyclerView.setAdapter(workerProgressAdapter);
 
         myAsyncTask.execute();
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 
     public enum WorkType implements Serializable {

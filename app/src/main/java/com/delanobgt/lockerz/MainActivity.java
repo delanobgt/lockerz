@@ -11,6 +11,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.delanobgt.lockerz.activities.DrawerActivity;
+import com.delanobgt.lockerz.activities.WorkerProgressActivity;
+import com.delanobgt.lockerz.services.EncryptWorkerService;
+
+import static com.delanobgt.lockerz.activities.WorkerProgressActivity.EXTRA_WORK_TYPE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +40,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (EncryptWorkerService.isActive()) {
+            Intent intent = new Intent(getApplicationContext(), WorkerProgressActivity.class);
+            intent.putExtra(EXTRA_WORK_TYPE, WorkerProgressActivity.WorkType.ENCRYPT);
+            startActivity(intent);
+            return;
+        }
 
         if (Build.VERSION.SDK_INT >= 23) {
             if (!hasPermissions(this, PERMISSIONS)) {

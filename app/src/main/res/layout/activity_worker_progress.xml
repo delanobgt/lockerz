@@ -22,9 +22,11 @@
         android:text="Currently using 3 crypto workers" />
 
     <LinearLayout
+        android:id="@+id/layout_mid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/tv_worker_count"
+        android:layout_above="@id/btn_cancel"
         android:orientation="vertical">
 
         <LinearLayout
@@ -60,4 +62,14 @@
             android:layout_height="wrap_content"
             tools:listitem="@layout/item_owned_file" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_proceed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:text="PROCEED"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#fff" />
 </RelativeLayout>
