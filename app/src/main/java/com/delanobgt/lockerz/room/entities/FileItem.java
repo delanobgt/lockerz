@@ -7,7 +7,6 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.delanobgt.lockerz.room.converters.FileItemTypeConverter;
 
@@ -106,7 +105,6 @@ public class FileItem implements Serializable {
 
     public void setEncrypted(boolean encrypted) {
         this.encrypted = encrypted;
-        Log.e("SET", encrypted + " " + path);
     }
 
     public enum FileItemType {

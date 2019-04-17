@@ -47,4 +47,7 @@ dependencies {
 
     // BCrypt
     implementation group: 'at.favre.lib', name: 'bcrypt', version: '0.7.0'
+
+    // Android Preference
+    implementation 'com.android.support:preference-v14:27.1.1'
 }

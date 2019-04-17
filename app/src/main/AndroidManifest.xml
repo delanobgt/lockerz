@@ -15,6 +15,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".activities.WorkerProgressActivity"
+            android:launchMode="singleTop" />
         <activity android:name=".activities.ChangePasswordActivity" />
         <activity
             android:name=".activities.AddFileActivity"
@@ -26,6 +29,7 @@
         <activity
             android:name=".activities.DrawerActivity"
             android:label="@string/title_activity_drawer"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -34,6 +38,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".services.EncryptWorkerService" />
     </application>
 
 </manifest>

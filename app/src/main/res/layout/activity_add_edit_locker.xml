@@ -69,7 +69,6 @@
             android:layout_height="40dp"
             android:layout_marginBottom="8dp"
             android:drawSelectorOnTop="true"
-            android:entries="@array/majors"
             android:spinnerMode="dialog"
             android:textSize="12dp"
             android:tooltipText="Encryption Type" />

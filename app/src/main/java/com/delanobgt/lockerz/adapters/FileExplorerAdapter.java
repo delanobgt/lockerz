@@ -45,6 +45,15 @@ public class FileExplorerAdapter extends RecyclerView.Adapter<FileExplorerAdapte
         return holder;
     }
 
+    private static void setCheckboxChecked(final CheckBox cb, final boolean bool) {
+        cb.post(new Runnable() {
+            @Override
+            public void run() {
+                cb.setChecked(bool);
+            }
+        });
+    }
+
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         if (!fileExplorer.isOnRootDir() && position == 0) {
@@ -105,12 +114,13 @@ public class FileExplorerAdapter extends RecyclerView.Adapter<FileExplorerAdapte
                 } else {
                     holder.ivFileExplorer.setImageResource(R.drawable.ic_file_24dp);
                     holder.tvDescription.setText("File");
+                    holder.cbSelected.setVisibility(View.VISIBLE);
                     holder.root.setOnClickListener(null);
                 }
                 if (selectedIndices.containsKey(position + offset)) {
-                    holder.cbSelected.setChecked(true);
+                    setCheckboxChecked(holder.cbSelected, true);
                 } else {
-                    holder.cbSelected.setChecked(false);
+                    setCheckboxChecked(holder.cbSelected, false);
                 }
                 holder.cbSelected.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override

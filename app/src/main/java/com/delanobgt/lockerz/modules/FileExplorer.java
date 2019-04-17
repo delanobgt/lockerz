@@ -7,6 +7,8 @@ import com.delanobgt.lockerz.room.entities.FileItem;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class FileExplorer {
 
@@ -88,6 +90,12 @@ public class FileExplorer {
                     fileItemList[i] = new FileItem(currentDir + "/" + filteredFiles[i], FileItem.FileItemType.FILE);
                 }
             }
+            Arrays.sort(fileItemList, new Comparator<FileItem>() {
+                @Override
+                public int compare(FileItem a, FileItem b) {
+                    return a.getFile().getName().compareTo(b.getFile().getName());
+                }
+            });
         } else {
             Log.e(TAG, "Path does not exist!");
         }

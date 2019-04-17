@@ -1,15 +1,12 @@
 package com.delanobgt.lockerz.activities;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -26,9 +23,11 @@ import android.widget.Toast;
 
 import com.delanobgt.lockerz.R;
 import com.delanobgt.lockerz.adapters.FileItemAdapter;
+import com.delanobgt.lockerz.modules.FileWorm;
 import com.delanobgt.lockerz.room.entities.Action;
 import com.delanobgt.lockerz.room.entities.FileItem;
 import com.delanobgt.lockerz.room.entities.Locker;
+import com.delanobgt.lockerz.services.EncryptWorkerService;
 import com.delanobgt.lockerz.viewmodels.ActionViewModel;
 import com.delanobgt.lockerz.viewmodels.FileItemViewModel;
 import com.delanobgt.lockerz.viewmodels.LockerViewModel;
@@ -38,15 +37,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.delanobgt.lockerz.activities.AddFileActivity.EXTRA_FILE_ITEMS;
+import static com.delanobgt.lockerz.activities.WorkerProgressActivity.EXTRA_WORK_TYPE;
+import static com.delanobgt.lockerz.services.EncryptWorkerService.EXTRA_LOCKER;
+import static com.delanobgt.lockerz.services.EncryptWorkerService.EXTRA_PASSWORD;
 
 public class LockerDetail extends AppCompatActivity {
 
     public static final String EXTRA_LOCKER_ID = "com.delanobgt.lockerz.activities.EXTRA_LOCKER_ID";
     public static final int ADD_FILES_REQUEST = 1;
-
-    private NotificationManager notificationManager;
-    private Notification.Builder notificationBuilder;
 
     private Integer lockerId = null;
     private volatile Locker locker = null;
@@ -81,8 +79,6 @@ public class LockerDetail extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locker_detail);
 
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
         Intent intent = getIntent();
         if (!intent.hasExtra(EXTRA_LOCKER_ID)) {
             Toast.makeText(getApplicationContext(), "Please reopen the app", Toast.LENGTH_SHORT).show();
@@ -100,7 +96,7 @@ public class LockerDetail extends AppCompatActivity {
             @Override
             public void callback(Set<Integer> pIsSelectedSet) {
                 isSelectedSet = pIsSelectedSet;
-                renewActionBar();
+                renewActionBar(locker);
                 invalidateOptionsMenu();
             }
         });
@@ -142,7 +138,7 @@ public class LockerDetail extends AppCompatActivity {
             public void onChanged(@Nullable Locker pLocker) {
                 if (locker == null) {
                     locker = pLocker;
-                    renewActionBar();
+                    renewActionBar(pLocker);
                 }
                 locker = pLocker;
                 tvEncryptedIn.setText("Encrypted in " + locker.getEncryptionType());
@@ -162,7 +158,7 @@ public class LockerDetail extends AppCompatActivity {
         });
     }
 
-    private void renewActionBar() {
+    private void renewActionBar(Locker pLocker) {
         if (isSelectedSet.size() > 0) {
             getSupportActionBar().setTitle("");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -171,7 +167,7 @@ public class LockerDetail extends AppCompatActivity {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
             getSupportActionBar().setDisplayShowTitleEnabled(true);
         } else {
-            getSupportActionBar().setTitle(locker.getName());
+            getSupportActionBar().setTitle(pLocker.getName());
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimary)));
@@ -201,16 +197,20 @@ public class LockerDetail extends AppCompatActivity {
 
         Set<Integer> isSelectedSet = fileItemAdapter.getIsSelectedSet();
         List<FileItem> fileItems = fileItemAdapter.getFileItems();
-        Boolean hasEncrypted = false, hasUnEncrypted = false;
+        Boolean hasEncrypted = false, hasDecrypted = false;
         for (Integer pos : isSelectedSet) {
-            hasUnEncrypted = true;
+            if (fileItems.get(pos).isEncrypted())
+                hasEncrypted = true;
+            else
+                hasDecrypted = true;
+
         }
-        if (hasEncrypted || hasUnEncrypted) {
+        if (hasEncrypted || hasDecrypted) {
             menu.findItem(R.id.item_select_all).setVisible(true);
-            if (hasUnEncrypted && !hasEncrypted) {
+            if (hasDecrypted && !hasEncrypted) {
                 menu.findItem(R.id.item_encrypt).setVisible(true);
             }
-            if (!hasUnEncrypted && hasEncrypted) {
+            if (!hasDecrypted && hasEncrypted) {
                 menu.findItem(R.id.item_decrypt).setVisible(true);
             }
             menu.findItem(R.id.item_delete_all).setVisible(true);
@@ -236,7 +236,7 @@ public class LockerDetail extends AppCompatActivity {
             case android.R.id.home:
                 if (isSelectedSet.size() > 0) {
                     isSelectedSet.clear();
-                    renewActionBar();
+                    renewActionBar(locker);
                     invalidateOptionsMenu();
                     fileItemAdapter.setIsSelectedSet(isSelectedSet);
                 } else {
@@ -293,44 +293,30 @@ public class LockerDetail extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == ADD_FILES_REQUEST && resultCode == RESULT_OK) {
-            final ArrayList<FileItem> fileItems = (ArrayList<FileItem>) data.getSerializableExtra(EXTRA_FILE_ITEMS);
-            final int NOTIFICATION_ID = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... voids) {
-                    for (FileItem fileItem : fileItems) {
-                        fileItem.setLockerId(lockerId);
-                        fileItem.setEncrypted(true);
-                        fileItemViewModel.insert(fileItem);
-                    }
-                    return null;
-                }
+            final ArrayList<FileItem> fileItems = (ArrayList<FileItem>) data.getSerializableExtra(AddFileActivity.EXTRA_FILE_ITEMS);
+            Intent serviceIntent = new Intent(this, EncryptWorkerService.class);
+            serviceIntent.putExtra(EXTRA_LOCKER, locker);
+            serviceIntent.putExtra(EXTRA_PASSWORD, "");
+            serviceIntent.putExtra(EncryptWorkerService.EXTRA_FILE_ITEMS, fileItems);
+            ContextCompat.startForegroundService(this, serviceIntent);
 
-                @Override
-                protected void onPreExecute() {
-                    notificationBuilder = new Notification.Builder(getApplicationContext())
-                            .setSmallIcon(R.drawable.ic_lock_green_24dp)
-                            .setContentTitle("Encryption on progress")
-                            .setContentText("...")
-                            .setAutoCancel(false)
-                            .setOngoing(true)
-                            .setProgress(0, 0, true);
-                    notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-                }
+            for (FileItem fileItem : fileItems) {
+                if (fileItem.getFile().isFile())
+                    fileItem = FileWorm.addPostfixFileItemExtension(fileItem, ".lockz");
+                fileItem.setEncrypted(true);
+                fileItem.setLockerId(locker.getId());
+                fileItemViewModel.insert(fileItem);
+            }
 
+            new Handler().postDelayed(new Runnable() {
                 @Override
-                protected void onPostExecute(Void aVoid) {
-                    notificationBuilder
-                            .setContentTitle("Encryption complete")
-                            .setContentText("...")
-                            .setAutoCancel(true)
-                            .setOngoing(false)
-                            .setProgress(0, 0, true);
-                    notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+                public void run() {
+                    Intent intent = new Intent(getApplicationContext(), WorkerProgressActivity.class);
+                    intent.putExtra(EXTRA_WORK_TYPE, WorkerProgressActivity.WorkType.ENCRYPT);
+                    startActivity(intent);
                 }
-            }.execute();
+            }, 1000);
 
-//            Toast.makeText(getApplicationContext(), "File added", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -338,7 +324,7 @@ public class LockerDetail extends AppCompatActivity {
     public void onBackPressed() {
         if (isSelectedSet.size() > 0) {
             isSelectedSet.clear();
-            renewActionBar();
+            renewActionBar(locker);
             invalidateOptionsMenu();
             fileItemAdapter.setIsSelectedSet(isSelectedSet);
         } else {

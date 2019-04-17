@@ -99,8 +99,8 @@ public class Locker implements Serializable {
 
     public enum EncryptionType {
         CAESAR(0),
-        DOUBLE_TRANSPOSITION(1),
-        AES(2);
+        VIGENERE(1),
+        XOR(2);
 
         private static Map<String, EncryptionType> stringMap;
 

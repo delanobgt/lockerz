@@ -60,8 +60,8 @@ public abstract class DB extends RoomDatabase {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            lockerDao.insert(new Locker("Locker 1", "Lorem ipsum dolor sit a met", Locker.EncryptionType.AES, BCrypt.withDefaults().hashToString(8, "1234".toCharArray())));
-            lockerDao.insert(new Locker("Locker 2", "Lorem ipsum dolor sit a met", Locker.EncryptionType.AES, BCrypt.withDefaults().hashToString(8, "1234".toCharArray())));
+            lockerDao.insert(new Locker("Locker 1", "Lorem ipsum dolor sit a met", Locker.EncryptionType.CAESAR, BCrypt.withDefaults().hashToString(8, "1234".toCharArray())));
+            lockerDao.insert(new Locker("Locker 2", "Lorem ipsum dolor sit a met", Locker.EncryptionType.CAESAR, BCrypt.withDefaults().hashToString(8, "1234".toCharArray())));
             return null;
         }
     }

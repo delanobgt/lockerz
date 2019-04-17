@@ -30,7 +30,6 @@ import com.delanobgt.lockerz.viewmodels.LockerViewModel;
 
 import java.util.List;
 
-
 public class LockerListFragment extends Fragment {
 
     private View viewEmpty;
