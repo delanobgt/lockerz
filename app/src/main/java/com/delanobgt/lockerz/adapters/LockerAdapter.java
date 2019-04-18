@@ -65,14 +65,6 @@ public class LockerAdapter extends RecyclerView.Adapter<LockerAdapter.LockerHold
                                 if (onLockerEditCallback != null)
                                     onLockerEditCallback.onLockerEdit(currentLocker);
                                 return true;
-                            case R.id.item_change_password:
-                                if (onLockerChangePasswordCallback != null)
-                                    onLockerChangePasswordCallback.callback(currentLocker);
-                                return true;
-                            case R.id.item_delete_release:
-                                if (onLockerDeleteCallback != null)
-                                    onLockerDeleteCallback.onLockerDelete(currentLocker);
-                                return true;
                             default:
                                 return false;
                         }

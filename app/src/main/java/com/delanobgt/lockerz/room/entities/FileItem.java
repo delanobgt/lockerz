@@ -56,6 +56,15 @@ public class FileItem implements Serializable {
         this.encrypted = encrypted;
     }
 
+    public FileItem(FileItem oldFileItem) {
+        this.id = oldFileItem.id;
+        this.path = oldFileItem.path;
+        this.type = oldFileItem.type;
+        this.lockerId = oldFileItem.lockerId;
+        this.encrypted = oldFileItem.encrypted;
+        this.file = new File(oldFileItem.path);
+    }
+
     public int getId() {
         return id;
     }

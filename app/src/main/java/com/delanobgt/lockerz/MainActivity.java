@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(getApplicationContext(), WorkerProgressActivity.class);
             intent.putExtra(EXTRA_WORK_TYPE, WorkerProgressActivity.WorkType.ENCRYPT);
             startActivity(intent);
+            finish();
             return;
         }
 

@@ -60,6 +60,7 @@ public class LockerListFragment extends Fragment {
                     public void callback(String password) {
                         Intent intent = new Intent(getContext(), LockerDetail.class);
                         intent.putExtra(LockerDetail.EXTRA_LOCKER_ID, locker.getId());
+                        intent.putExtra(LockerDetail.EXTRA_LOCKER_PASSWORD, password);
                         startActivity(intent);
                     }
                 });

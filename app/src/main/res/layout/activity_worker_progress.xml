@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:padding="4dp"
         android:text="On Progress"
+        android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <TextView
@@ -19,14 +20,16 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_status"
         android:padding="4dp"
-        android:text="Currently using 3 crypto workers" />
+        android:text="Currently using 3 crypto workers"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <LinearLayout
         android:id="@+id/layout_mid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/tv_worker_count"
         android:layout_above="@id/btn_cancel"
+        android:layout_below="@+id/tv_worker_count"
         android:orientation="vertical">
 
         <LinearLayout
@@ -60,7 +63,7 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:listitem="@layout/item_owned_file" />
+            tools:listitem="@layout/item_worker_progress" />
     </LinearLayout>
 
     <Button

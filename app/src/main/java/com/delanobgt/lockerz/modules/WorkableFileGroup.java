@@ -2,10 +2,13 @@ package com.delanobgt.lockerz.modules;
 
 import android.util.Log;
 
+import com.delanobgt.lockerz.activities.WorkerProgressActivity;
+
 import java.io.File;
 import java.io.RandomAccessFile;
 
 import static com.delanobgt.lockerz.modules.FileWorm.addPostfixFileExtension;
+import static com.delanobgt.lockerz.modules.FileWorm.removePostfixFileExtension;
 
 public class WorkableFileGroup {
 
@@ -20,16 +23,23 @@ public class WorkableFileGroup {
     private long seekPos, totalLen;
     private RandomAccessFile readRaf = null, writeRaf = null;
     private byte[] data = new byte[1048576];
+    private WorkerProgressActivity.WorkType workType;
 
-    public WorkableFileGroup(FileGroup fileGroup, FileModifier fileModifier) {
-        int filesCount = fileGroup.getFilesCount();
+    public WorkableFileGroup(FileGroup fileGroup, FileModifier fileModifier, WorkerProgressActivity.WorkType workType) {
         this.fileModifier = fileModifier;
+        this.workType = workType;
+
+        int filesCount = fileGroup.getFilesCount();
         originalFiles = fileGroup.getFiles().toArray(new File[filesCount]);
         modifiedFiles = new File[filesCount];
         originalTotalBytes = fileGroup.getTotalBytes();
         for (int i = 0; i < filesCount; i++) {
             try {
-                File modifiedFile = addPostfixFileExtension(originalFiles[i], ".lockz");
+                File modifiedFile = null;
+                if (workType == WorkerProgressActivity.WorkType.ENCRYPT)
+                    modifiedFile = addPostfixFileExtension(originalFiles[i], ".lockz");
+                else if (workType == WorkerProgressActivity.WorkType.DECRYPT)
+                    modifiedFile = removePostfixFileExtension(originalFiles[i], ".lockz");
                 if (!modifiedFile.exists()) modifiedFile.createNewFile();
                 modifiedFiles[i] = modifiedFile;
             } catch (Exception ex) {

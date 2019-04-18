@@ -66,23 +66,26 @@ public class FileWorm {
     }
 
     public static File addPostfixFileExtension(File f, String newExtension) {
-        return new File(f.getAbsolutePath() + newExtension);
+        if (!f.getAbsolutePath().endsWith(newExtension))
+            return new File(f.getAbsolutePath() + newExtension);
+        return f;
     }
 
     public static File removePostfixFileExtension(File f, String newExtension) {
-        if (f.getAbsolutePath().endsWith(".lockz")) {
+        if (f.getAbsolutePath().endsWith(newExtension)) {
             return new File(f.getAbsolutePath().substring(0, f.getAbsolutePath().length() - 6));
         }
         return f;
     }
 
     public static FileItem addPostfixFileItemExtension(FileItem f, String newExtension) {
-        f.setPath(f.getFile().getAbsolutePath() + newExtension);
+        if (!f.getFile().getAbsolutePath().endsWith(newExtension))
+            f.setPath(f.getFile().getAbsolutePath() + newExtension);
         return f;
     }
 
     public static FileItem removePostfixFileItemExtension(FileItem f, String newExtension) {
-        if (f.getFile().getAbsolutePath().endsWith(".lockz")) {
+        if (f.getFile().getAbsolutePath().endsWith(newExtension)) {
             f.setPath(f.getFile().getAbsolutePath().substring(0, f.getFile().getAbsolutePath().length() - 6));
             return f;
         }

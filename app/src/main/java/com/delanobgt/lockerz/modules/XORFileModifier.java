@@ -1,12 +1,12 @@
 package com.delanobgt.lockerz.modules;
 
-public class VigenereFileModifier implements FileModifier {
+public class XORFileModifier implements FileModifier {
 
     private String key;
     private byte[] rots;
     private boolean decryptMode;
 
-    public VigenereFileModifier(String key, boolean decryptMode) {
+    public XORFileModifier(String key, boolean decryptMode) {
         this.key = key;
         int[] rots = new int[key.length()];
         for (int i = 0; i < key.length(); i++) {
@@ -17,14 +17,8 @@ public class VigenereFileModifier implements FileModifier {
 
     @Override
     public void modify(byte[] data, long pos, long len, long total) {
-        if (!decryptMode) {
-            for (int i = 0; i < len; i++) {
-                data[i] = (byte) (((int) (data[i]) + rots[(int) ((pos + i) % rots.length)] + 256) % 256);
-            }
-        } else {
-            for (int i = 0; i < len; i++) {
-                data[i] = (byte) (((int) (data[i]) - rots[(int) ((pos + i) % rots.length)]) % 256);
-            }
+        for (int i = 0; i < len; i++) {
+            data[i] = (byte) (data[i] ^ rots[(int) ((pos + i) % rots.length)]);
         }
     }
 

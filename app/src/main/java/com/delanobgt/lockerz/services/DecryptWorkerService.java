@@ -35,11 +35,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class EncryptWorkerService extends Service {
+public class DecryptWorkerService extends Service {
 
-    public static final String NOTIFICATION_CHANNEL_ID = "com.delanobgt.lockerz.EncryptWorkerService";
-    public static final int NOTIFICATION_ID = 1;
-    public static final int PENDING_INTENT_REQUEST = 11;
+    public static final String NOTIFICATION_CHANNEL_ID = "com.delanobgt.lockerz.DecryptWorkerService";
+    public static final int NOTIFICATION_ID = 2;
+    public static final int PENDING_INTENT_REQUEST = 12;
 
     public static final String EXTRA_PASSWORD = "com.delanobgt.lockerz.services.EXTRA_PASSWORD";
     public static final String EXTRA_LOCKER = "com.delanobgt.lockerz.services.EXTRA_LOCKER";
@@ -78,9 +78,9 @@ public class EncryptWorkerService extends Service {
                 PENDING_INTENT_REQUEST, notificationIntent, 0);
 
         notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setContentTitle("Encryption in progress")
+                .setContentTitle("Decryption in progress")
                 .setContentText("Indexing files..")
-                .setSmallIcon(R.drawable.ic_lock_green_24dp)
+                .setSmallIcon(R.drawable.ic_lock_open_white_24dp)
                 .setContentIntent(pendingIntent)
                 .setProgress(0, 0, true);
 
@@ -97,11 +97,11 @@ public class EncryptWorkerService extends Service {
                 String password = intent.getStringExtra(EXTRA_PASSWORD);
 
                 if (locker.getEncryptionType() == Locker.EncryptionType.CAESAR) {
-                    fileModifier = new CaesarFileModifier(password, false);
+                    fileModifier = new CaesarFileModifier(password, true);
                 } else if (locker.getEncryptionType() == Locker.EncryptionType.VIGENERE) {
-                    fileModifier = new VigenereFileModifier(password, false);
+                    fileModifier = new VigenereFileModifier(password, true);
                 } else if (locker.getEncryptionType() == Locker.EncryptionType.XOR) {
-                    fileModifier = new XORFileModifier(password, false);
+                    fileModifier = new XORFileModifier(password, true);
                 }
 
                 List<File> flattenedFiles = FileWorm.flattenFiles(FileWorm.convertFileItemsToFiles(fileItems));
@@ -110,7 +110,7 @@ public class EncryptWorkerService extends Service {
                 List<FileGroup> fileGroups = FileWorm.divideIntoFileGroups(flattenedFiles, workerCount);
                 workableFileGroups = new WorkableFileGroup[workerCount];
                 for (int i = 0; i < workerCount; i++) {
-                    workableFileGroups[i] = new WorkableFileGroup(fileGroups.get(i), fileModifier, WorkerProgressActivity.WorkType.ENCRYPT);
+                    workableFileGroups[i] = new WorkableFileGroup(fileGroups.get(i), fileModifier, WorkerProgressActivity.WorkType.DECRYPT);
                 }
 
                 asyncTasks = new AsyncTask[workerCount];
@@ -176,7 +176,7 @@ public class EncryptWorkerService extends Service {
             stopSelf();
             notificationBuilder
                     .setProgress(0, 0, false)
-                    .setContentTitle("Encryption done")
+                    .setContentTitle("Decryption done")
                     .setAutoCancel(true)
                     .setOngoing(false)
                     .setContentText(String.format("Total: %d, Success: %d, Fail: %d", totalCount, successCount, failCount));
@@ -185,12 +185,12 @@ public class EncryptWorkerService extends Service {
 //            int intTotalOriginalBytes = (int) (((double) totalOriginalBytes / Long.MAX_VALUE) * Integer.MAX_VALUE);
 //            notificationBuilder
 //                    .setProgress(intTotalOriginalBytes, intTotalModifiedBytes, false)
-//                    .setContentTitle("Encryption in progress")
+//                    .setContentTitle("Decryption in progress")
 //                    .setContentText(String.format("Processed %d out of %d file(s)", successCount + failCount, totalCount));
 
             notificationBuilder
                     .setProgress(totalCount, successCount + failCount, false)
-                    .setContentTitle("Encryption in progress")
+                    .setContentTitle("Decryption in progress")
                     .setContentText(String.format("Processed %d out of %d file(s)", successCount + failCount, totalCount));
         }
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
@@ -210,8 +210,8 @@ public class EncryptWorkerService extends Service {
     }
 
     public class LocalBinder extends Binder {
-        public EncryptWorkerService getService() {
-            return EncryptWorkerService.this;
+        public DecryptWorkerService getService() {
+            return DecryptWorkerService.this;
         }
     }
 
@@ -237,7 +237,6 @@ public class EncryptWorkerService extends Service {
                     break;
                 } else {
                     if (workableFileGroup.hasNext()) {
-                        Log.e("HAHAHA HOHOHO", workableFileGroup.getOriginalTotalBytes() + "");
                         if (!workableFileGroup.travelNext()) {
                             Log.e("HAHAHA", "TRAVEL ERROR ON " + workableFileGroup.toString());
                             cancel(true);
